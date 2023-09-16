@@ -14,6 +14,7 @@ public class ControlaChefe : MonoBehaviour, IMatavel
     public Image imageSlider;
     public Slider sliderVidaChefe;
     public Color corVidaMaxima, corVidaMinima;
+    public GameObject particulaSangueZumbi;
 
 
     private void Start()
@@ -75,6 +76,11 @@ public class ControlaChefe : MonoBehaviour, IMatavel
         {
             Morrer();
         }
+    }
+
+    public void ParticulaSangue(Vector3 posicao, Quaternion rotacao)
+    {
+        Instantiate(particulaSangueZumbi, posicao, rotacao);
     }
 
     public void Morrer()

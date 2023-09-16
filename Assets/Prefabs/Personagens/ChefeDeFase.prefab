@@ -584,6 +584,8 @@ MonoBehaviour:
   sliderVidaChefe: {fileID: 975976057}
   corVidaMaxima: {r: 0.22820123, g: 0.9245283, b: 0.100302614, a: 1}
   corVidaMinima: {r: 0.8490566, g: 0.108134575, b: 0.108134575, a: 1}
+  particulaSangueZumbi: {fileID: 5153104301958010748, guid: 63a02a012238000448fc8fc4e77c0ac5,
+    type: 3}
 --- !u!1 &1065480718027956
 GameObject:
   m_ObjectHideFlags: 0
