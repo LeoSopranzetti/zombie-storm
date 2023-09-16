@@ -15,11 +15,14 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     private float contadorVagar;
     private float tempoEntrePosicoesAleatorias = 4;
     public float porcentagemGerarKitMedico = 0.1f;
+    public float porcentagemGerarSMG= 0.04f;
     public GameObject kitMedicoPrefab;
+    public GameObject smgWeapon;
     private ControlaInterface scriptControlaInterface;
     [HideInInspector]
     public GeradorZumbis meuGerador;
     public GameObject particulaSangueZumbi;
+    private float timeToZombieDespawnAfterDeath = 20f;
 
 
     // Use this for initialization
@@ -113,21 +116,29 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
 
     public void Morrer()
     {
-        Destroy(gameObject, 20);
         animacaoInimigo.Morrer();
-        movimentaInimigo.Morrer();
+        movimentaInimigo.Morrer(timeToZombieDespawnAfterDeath);
         this.enabled = false;
         ControlaAudio.instancia.PlayOneShot(SomDeMorte);
-        verificarGeracaoKitMedico(porcentagemGerarKitMedico);
+        checkDrop();
+        Destroy(gameObject, timeToZombieDespawnAfterDeath);
         scriptControlaInterface.atualizarQuantidadeDeZumbisMortos();
         meuGerador.diminuirQuantidadeDeZumbisVivos();
     }
 
-    void verificarGeracaoKitMedico(float porcentagemGeracao)
+    void checkDrop()
     {
-        if (Random.value <= porcentagemGeracao)
+        if (Random.value <= porcentagemGerarKitMedico)
         {
             Instantiate(kitMedicoPrefab, transform.position, Quaternion.identity);
+            timeToZombieDespawnAfterDeath = 1f;
+            return;
+        }
+        if (Random.value <= porcentagemGerarSMG)
+        {
+            Instantiate(smgWeapon, transform.position, Quaternion.identity);
+            timeToZombieDespawnAfterDeath = 1f;
+            return;
         }
     }
 }

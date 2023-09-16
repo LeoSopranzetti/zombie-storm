@@ -15,6 +15,7 @@ public class ControlaChefe : MonoBehaviour, IMatavel
     public Slider sliderVidaChefe;
     public Color corVidaMaxima, corVidaMinima;
     public GameObject particulaSangueZumbi;
+    private float timeToBossDespawnAfterDeath = 20f;
 
 
     private void Start()
@@ -85,9 +86,10 @@ public class ControlaChefe : MonoBehaviour, IMatavel
 
     public void Morrer()
     {
-        Destroy(gameObject, 20);
+        Destroy(gameObject, timeToBossDespawnAfterDeath);
+        sliderVidaChefe.gameObject.SetActive(false);
         animacaoChefe.Morrer();
-        movimentoChefe.Morrer();
+        movimentoChefe.Morrer(timeToBossDespawnAfterDeath);
         this.enabled = false;
         Instantiate(kitMedicoPrefab, transform.position, Quaternion.identity);
         agente.enabled = false;

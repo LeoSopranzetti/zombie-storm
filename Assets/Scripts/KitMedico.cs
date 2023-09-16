@@ -6,7 +6,7 @@ public class KitMedico : MonoBehaviour
 {
 
     public int quantidadeDeCura = 15;
-    public int tempoDeDestruicao = 5;
+    public int tempoDeDestruicao = 15;
 
     private void Start()
     {

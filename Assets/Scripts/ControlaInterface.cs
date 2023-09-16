@@ -15,6 +15,8 @@ public class ControlaInterface : MonoBehaviour {
     private int quantidadeDeZumbisMortos;
     public Text textoZumbisMortos;
     public Text textoChefeAparece;
+    public Text weaponText;
+    public Text ammunitionText;
 
     // Use this for initialization
     void Start () {
@@ -36,6 +38,21 @@ public class ControlaInterface : MonoBehaviour {
     {
         quantidadeDeZumbisMortos++;
         textoZumbisMortos.text = string.Format("x{0}", quantidadeDeZumbisMortos);
+    }
+
+    public void updateWeaponNameAndAmmunitionQuantity(int ammunitionQuantity, string weaponName)
+    {
+
+        weaponText.text = string.Format("Arma: {0}", weaponName);
+        if (weaponName == "Pistola")
+        {
+            ammunitionText.text = string.Format("Munição: Infinita");
+        } else
+        {
+            ammunitionText.text = string.Format("Munição: {0}", ammunitionQuantity);
+        }
+
+
     }
 
     public void GameOver ()

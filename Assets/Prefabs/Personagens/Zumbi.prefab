@@ -542,8 +542,8 @@ GameObject:
   - component: {fileID: 4941635705825534}
   - component: {fileID: 136079381028039656}
   - component: {fileID: 95175694969816346}
-  - component: {fileID: 114480877788707542}
   - component: {fileID: 54163392757231022}
+  - component: {fileID: 114480877788707542}
   - component: {fileID: 114899746834038156}
   - component: {fileID: 114346233917828092}
   - component: {fileID: 114907622645617620}
@@ -628,26 +628,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &114480877788707542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1063500868937916}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59eabf864c8a857479298ebeae16c339, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Jogador: {fileID: 0}
-  SomDeMorte: {fileID: 8300000, guid: f85f0d673b54ff3429fd77543d83179a, type: 3}
-  porcentagemGerarKitMedico: 0.1
-  kitMedicoPrefab: {fileID: 1060151288946202, guid: 6150c6f66b7034ec5b3672478195682a,
-    type: 3}
-  meuGerador: {fileID: 0}
-  particulaSangueZumbi: {fileID: 5153104301958010748, guid: 63a02a012238000448fc8fc4e77c0ac5,
-    type: 3}
 --- !u!54 &54163392757231022
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -664,6 +644,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
+--- !u!114 &114480877788707542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063500868937916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59eabf864c8a857479298ebeae16c339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Jogador: {fileID: 0}
+  SomDeMorte: {fileID: 8300000, guid: f85f0d673b54ff3429fd77543d83179a, type: 3}
+  porcentagemGerarKitMedico: 0.1
+  porcentagemGerarSMG: 0.1
+  kitMedicoPrefab: {fileID: 1060151288946202, guid: 6150c6f66b7034ec5b3672478195682a,
+    type: 3}
+  smgWeapon: {fileID: 1789961188982158, guid: 775cc8a99c9819b4281dc49ab451f075, type: 3}
+  meuGerador: {fileID: 0}
+  particulaSangueZumbi: {fileID: 5153104301958010748, guid: 63a02a012238000448fc8fc4e77c0ac5,
+    type: 3}
 --- !u!114 &114899746834038156
 MonoBehaviour:
   m_ObjectHideFlags: 0

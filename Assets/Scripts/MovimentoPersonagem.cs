@@ -31,18 +31,18 @@ public class MovimentoPersonagem : MonoBehaviour
         meuRigidbody.MoveRotation(novaRotacao);
     }
 
-    public void Morrer()
+    public void Morrer(float timeToZombieDespawnAfterDeath)
     {
 
         meuRigidbody.velocity = Vector3.zero;
         GetComponent<Collider>().enabled = false;
-        StartCoroutine(ExecuteWithDelay());
+        StartCoroutine(ExecuteWithDelay(timeToZombieDespawnAfterDeath));
 
     }
 
-    private IEnumerator ExecuteWithDelay()
+    private IEnumerator ExecuteWithDelay(float timeToZombieDespawnAfterDeath)
     {
-        yield return new WaitForSeconds(15f); // Defina o tempo de espera em segundos
+        yield return new WaitForSeconds(timeToZombieDespawnAfterDeath); // Defina o tempo de espera em segundos
         meuRigidbody.constraints = RigidbodyConstraints.None;
         meuRigidbody.isKinematic = false;
     }

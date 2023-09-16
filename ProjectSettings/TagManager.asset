@@ -7,6 +7,8 @@ TagManager:
   - Inimigo
   - Jogador
   - Chefe
+  - SMG
+  - Pistol
   layers:
   - Default
   - TransparentFX
