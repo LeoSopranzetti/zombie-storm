@@ -295,6 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Jogador: {fileID: 1665214584}
+  cjHereWeGoAgain: {fileID: 8300000, guid: 3e936f96e1fdb60438f267332a469f1f, type: 3}
 --- !u!4 &18796323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4544171000348092, guid: 3f715056abeb9446fb0b5d697e133844,
@@ -919,7 +920,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 6dafd8386ea562f40843f0e59ca53129, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 7e355e5c553b39c4a9cc3271ed029ba9, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
