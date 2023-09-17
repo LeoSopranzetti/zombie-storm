@@ -12,13 +12,25 @@ public class ControlaJogador : MonoBehaviour, IMatavel, ICuravel
     public AudioClip SomDeDano;
     private MovimentoJogador meuMovimentoJogador;
     private AnimacaoPersonagem animacaoJogador;
+    public ControlaArma controlaArma;
     public Status statusJogador;
+    private string playerClass;
 
     private void Start()
     {
         meuMovimentoJogador = GetComponent<MovimentoJogador>();
         animacaoJogador = GetComponent<AnimacaoPersonagem>();
         statusJogador = GetComponent<Status>();
+        controlaArma = GetComponent<ControlaArma>();
+
+
+        if (PlayerPrefs.GetString("Class") != null)
+        {
+            playerClass = PlayerPrefs.GetString("Class");
+        }
+
+        setDamageAndAttackSpeedToWeapon();
+        //controlaArma.changeWeapon(playerClass);
     }
 
     // Update is called once per frame
@@ -40,11 +52,20 @@ public class ControlaJogador : MonoBehaviour, IMatavel, ICuravel
         meuMovimentoJogador.RotacaoJogador(MascaraChao);
     }
 
-    public void TomarDano (int dano)
+    public void TomarDano (float dano)
     {
-        statusJogador.Vida -= dano;
-        scriptControlaInterface.AtualizarSliderVidaJogador();
-        ControlaAudio.instancia.PlayOneShot(SomDeDano);
+        int danoMitigado = (int)dano - statusJogador.armor;
+        if (danoMitigado >= 0)
+        {
+            statusJogador.Vida -= dano;
+            scriptControlaInterface.AtualizarSliderVidaJogador();
+            ControlaAudio.instancia.PlayOneShot(SomDeDano);
+        } else
+        {
+            --statusJogador.Vida;
+            scriptControlaInterface.AtualizarSliderVidaJogador();
+            ControlaAudio.instancia.PlayOneShot(SomDeDano);
+        }
         if(statusJogador.Vida <= 0)
         {
             Morrer();
@@ -64,5 +85,21 @@ public class ControlaJogador : MonoBehaviour, IMatavel, ICuravel
             statusJogador.Vida = statusJogador.VidaInicial;
         }
         scriptControlaInterface.AtualizarSliderVidaJogador();
+    }
+
+    private void setDamageAndAttackSpeedToWeapon()
+    {
+        controlaArma.changeWeapon(playerClass);
+        if (playerClass == "Pistol")
+        {
+            statusJogador.attack = 2f;
+            statusJogador.attackSpeed = 0.5f;
+            statusJogador.VidaInicial += 50;
+            statusJogador.Vida += 50;
+        } else if (playerClass == "SMG")
+        {
+            statusJogador.attack = 0.5f;
+            statusJogador.attackSpeed = 0.35f;
+        }
     }
 }

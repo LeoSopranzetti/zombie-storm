@@ -66,10 +66,11 @@ public class ControlaChefe : MonoBehaviour, IMatavel
     void AtacaJogador()
     {
         int dano = Random.Range(30, 40);
+        dano += (int)statusChefe.attack;
         jogador.GetComponent<ControlaJogador>().TomarDano(dano);
     }
 
-    public void TomarDano(int dano)
+    public void TomarDano(float dano)
     {
         statusChefe.Vida -= dano;
         AtualizarInterface();

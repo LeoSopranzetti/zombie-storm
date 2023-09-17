@@ -17,9 +17,9 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     private float contadorVagar;
     private float tempoEntrePosicoesAleatorias = 4;
     public float porcentagemGerarKitMedico = 0.1f;
-    public float porcentagemGerarSMG= 0.04f;
+    public float porcentagemDropUpgradePlayer = 0.03f;
     public GameObject kitMedicoPrefab;
-    public GameObject smgWeapon;
+    public GameObject playerUpgradeItem;
     private ControlaInterface scriptControlaInterface;
     [HideInInspector]
     public GeradorZumbis meuGerador;
@@ -98,6 +98,7 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     void AtacaJogador ()
     {
         int dano = Random.Range(20, 30);
+        dano += (int)statusInimigo.attack;
         Jogador.GetComponent<ControlaJogador>().TomarDano(dano);
     }
 
@@ -122,7 +123,7 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
         //transform.GetChild(geraTipoZumbi).gameObject.SetActive(true);
     }
 
-    public void TomarDano(int dano)
+    public void TomarDano(float dano)
     {
         statusInimigo.Vida -= dano;
         StopCoroutine(sliderFadeOut());
@@ -153,15 +154,26 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
 
     void checkDrop()
     {
+        if (Time.timeSinceLevelLoad > 30)
+        {
+            porcentagemDropUpgradePlayer = 0.2f;
+        } else if (Time.timeSinceLevelLoad > 90)
+        {
+            porcentagemDropUpgradePlayer = 0.1f;
+        } else if (Time.timeSinceLevelLoad > 180)
+        {
+            porcentagemDropUpgradePlayer = 0.05f;
+        }
+
         if (Random.value <= porcentagemGerarKitMedico)
         {
             Instantiate(kitMedicoPrefab, transform.position, Quaternion.identity);
             timeToZombieDespawnAfterDeath = 1f;
             return;
         }
-        if (Random.value <= porcentagemGerarSMG)
+        if (Random.value <= porcentagemDropUpgradePlayer)
         {
-            Instantiate(smgWeapon, transform.position, Quaternion.identity);
+            Instantiate(playerUpgradeItem, transform.position, Quaternion.identity);
             timeToZombieDespawnAfterDeath = 1f;
             return;
         }

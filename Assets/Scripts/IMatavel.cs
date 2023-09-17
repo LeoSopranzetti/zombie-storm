@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IMatavel
 {
-    void TomarDano(int dano);
+    void TomarDano(float dano);
 
     void Morrer();
 }

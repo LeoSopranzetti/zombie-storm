@@ -12,6 +12,9 @@ public class GeradorChefe : MonoBehaviour
     public Transform[] posicoesPossiveisDeGeracao;
     private Transform jogador;
     public AudioClip somDeGeracao;
+    public float extraLifePerSpawn = 0;
+    public float extraDamagePerSpawn = 0;
+
 
     private void Start()
     {
@@ -24,13 +27,16 @@ public class GeradorChefe : MonoBehaviour
     {
         if (Time.timeSinceLevelLoad > tempoParaProximaGeracao)
         {
-            Vector3 posicaoDeCriacao = calcularPosicaoMaisDistanteDoJogador(); 
-            Instantiate(chefePrefab, posicaoDeCriacao, Quaternion.identity);
+            Vector3 posicaoDeCriacao = calcularPosicaoMaisDistanteDoJogador();
+            GameObject newBoss = Instantiate(chefePrefab, posicaoDeCriacao, Quaternion.identity);
+            addStatsPerSpawn(newBoss);
             ControlaAudio.instancia.PlayOneShot(somDeGeracao);
             scriptControlaInterface.AparecerChefeCriado();
             tempoParaProximaGeracao = Time.timeSinceLevelLoad + tempoEntreGeracoes;
+
         }
     }
+
 
     Vector3 calcularPosicaoMaisDistanteDoJogador()
     {
@@ -48,6 +54,15 @@ public class GeradorChefe : MonoBehaviour
 
 
         return posicaoMaiorDistancia;
+    }
+
+    void addStatsPerSpawn(GameObject newBoss)
+    {
+        newBoss.GetComponent<Status>().VidaInicial += extraLifePerSpawn;
+        newBoss.GetComponent<Status>().Vida += extraLifePerSpawn;
+        newBoss.GetComponent<Status>().attack += extraDamagePerSpawn;
+        extraLifePerSpawn += 15;
+        extraDamagePerSpawn += 5;
     }
 
 }

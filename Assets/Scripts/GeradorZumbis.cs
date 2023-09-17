@@ -9,14 +9,14 @@ public class GeradorZumbis : MonoBehaviour {
     public float TempoGerarZumbi = 1;
     public LayerMask LayerZumbi;
     private float distanciaDeGeracao = 3;
-    private float DistanciaDoJogadorParaGeracao = 20;
+    private float DistanciaDoJogadorParaGeracao = 13;
     private GameObject jogador;
-    private int quantidadeMaximaDeZumbisVivos = 3;
+    private int quantidadeMaximaDeZumbisVivos = 2;
     private int quantidadeDeZumbisVivos;
     private float contadorAumentoSpawnRate;
     private int vidaExtraZumbis = 0;
-    private float tempoProximoAumentoSpawnRate = 15;
-    private float tempoProximaVidaExtraZumbis = 45;
+    private float tempoProximoAumentoSpawnRate = 30;
+    private float tempoProximaVidaExtraZumbis = 30;
     private float contadorVidaExtraZumbis;
 
     private void Start()
@@ -82,6 +82,7 @@ public class GeradorZumbis : MonoBehaviour {
         {
             zumbi.GetComponent<Status>().VidaInicial += vidaExtraZumbis;
             zumbi.GetComponent<Status>().Vida += vidaExtraZumbis;
+            zumbi.GetComponent<Status>().attack += 5;
         }
         zumbi.meuGerador = this;
         quantidadeDeZumbisVivos++;

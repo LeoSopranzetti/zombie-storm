@@ -659,10 +659,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SomDeMorte: {fileID: 8300000, guid: f85f0d673b54ff3429fd77543d83179a, type: 3}
   porcentagemGerarKitMedico: 0.1
-  porcentagemGerarSMG: 1
+  porcentagemDropUpgradePlayer: 0.3
   kitMedicoPrefab: {fileID: 1060151288946202, guid: 6150c6f66b7034ec5b3672478195682a,
     type: 3}
-  smgWeapon: {fileID: 1789961188982158, guid: 775cc8a99c9819b4281dc49ab451f075, type: 3}
+  playerUpgradeItem: {fileID: 1316198323954070, guid: 8e9e7a65205bc4c209ccd0a5431af8ff,
+    type: 3}
   meuGerador: {fileID: 0}
   particulaSangueZumbi: {fileID: 5153104301958010748, guid: 63a02a012238000448fc8fc4e77c0ac5,
     type: 3}
