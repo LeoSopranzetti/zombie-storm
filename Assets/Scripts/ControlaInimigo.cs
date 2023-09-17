@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class ControlaInimigo : MonoBehaviour, IMatavel
 {
 
-    public GameObject Jogador;
+    private GameObject Jogador;
     private MovimentoPersonagem movimentaInimigo;
     private AnimacaoPersonagem animacaoInimigo;
     private Status statusInimigo;
@@ -23,6 +25,9 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     public GeradorZumbis meuGerador;
     public GameObject particulaSangueZumbi;
     private float timeToZombieDespawnAfterDeath = 20f;
+    public Image imageSlider;
+    public Slider sliderVidaZumbi;
+    public Color corVidaMaxima, corVidaMinima;
 
 
     // Use this for initialization
@@ -33,6 +38,8 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
         AleatorizarZumbi();
         statusInimigo = GetComponent<Status>();
         scriptControlaInterface = GameObject.FindObjectOfType(typeof(ControlaInterface)) as ControlaInterface;
+        sliderVidaZumbi.maxValue = statusInimigo.VidaInicial;
+        AtualizarInterface();
     }
 
     void FixedUpdate()
@@ -96,14 +103,31 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
 
     void AleatorizarZumbi ()
     {
-        int geraTipoZumbi = Random.Range(1, transform.childCount);
-        transform.GetChild(geraTipoZumbi).gameObject.SetActive(true);
+        List<GameObject> childList = new List<GameObject>();
+
+
+        foreach (Transform child in transform)
+        {
+            if (child.name.StartsWith("Zumbi"))
+            {
+                childList.Add(child.gameObject);
+            }
+
+        }
+
+        int geraTipoZumbi = Random.Range(1, childList.Count);
+        childList[geraTipoZumbi].gameObject.SetActive(true);
+
+        //int geraTipoZumbi = Random.Range(1, transform.childCount);
+        //transform.GetChild(geraTipoZumbi).gameObject.SetActive(true);
     }
 
     public void TomarDano(int dano)
     {
         statusInimigo.Vida -= dano;
-        if(statusInimigo.Vida <= 0)
+        StopCoroutine(sliderFadeOut());
+        AtualizarInterface();
+        if (statusInimigo.Vida <= 0)
         {
             Morrer();
         }
@@ -118,6 +142,7 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     {
         animacaoInimigo.Morrer();
         movimentaInimigo.Morrer(timeToZombieDespawnAfterDeath);
+        sliderVidaZumbi.gameObject.SetActive(false);
         this.enabled = false;
         ControlaAudio.instancia.PlayOneShot(SomDeMorte);
         checkDrop();
@@ -140,5 +165,29 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
             timeToZombieDespawnAfterDeath = 1f;
             return;
         }
+    }
+
+    void AtualizarInterface()
+    {
+        if (statusInimigo.VidaInicial == 1)
+        {
+            sliderVidaZumbi.gameObject.SetActive(false);
+        } else
+        {
+            sliderVidaZumbi.gameObject.SetActive(true);
+            sliderVidaZumbi.value = statusInimigo.Vida;
+            float porcentagemVida = (float)statusInimigo.Vida / statusInimigo.VidaInicial;
+            Color corDaVida = Color.Lerp(corVidaMinima, corVidaMaxima, porcentagemVida);
+            imageSlider.color = corDaVida;
+            StartCoroutine(sliderFadeOut());
+        }
+
+
+    }
+
+    private IEnumerator sliderFadeOut()
+    {
+        yield return new WaitForSeconds(4f);
+        sliderVidaZumbi.gameObject.SetActive(false);
     }
 }

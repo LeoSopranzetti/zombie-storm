@@ -11,15 +11,19 @@ public class GeradorZumbis : MonoBehaviour {
     private float distanciaDeGeracao = 3;
     private float DistanciaDoJogadorParaGeracao = 20;
     private GameObject jogador;
-    private int quantidadeMaximaDeZumbisVivos = 2;
+    private int quantidadeMaximaDeZumbisVivos = 3;
     private int quantidadeDeZumbisVivos;
-    private float tempoProximoAumentoDeDificuldade = 5;
-    private float contadorAumentaDificuldade;
+    private float contadorAumentoSpawnRate;
+    private int vidaExtraZumbis = 0;
+    private float tempoProximoAumentoSpawnRate = 15;
+    private float tempoProximaVidaExtraZumbis = 45;
+    private float contadorVidaExtraZumbis;
 
     private void Start()
     {
         jogador = GameObject.FindWithTag("Jogador");
-        contadorAumentaDificuldade = tempoProximoAumentoDeDificuldade;
+        contadorAumentoSpawnRate = tempoProximoAumentoSpawnRate;
+        contadorVidaExtraZumbis = tempoProximaVidaExtraZumbis;
         for (int i = 0; i < quantidadeMaximaDeZumbisVivos; i++)
         {
             StartCoroutine(GerarNovoZumbi());
@@ -29,7 +33,6 @@ public class GeradorZumbis : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-
         bool possoGerarZumbisPelaDistancia = Vector3.Distance(transform.position, jogador.transform.position) > DistanciaDoJogadorParaGeracao;
 
         if (possoGerarZumbisPelaDistancia == true && quantidadeDeZumbisVivos < quantidadeMaximaDeZumbisVivos)
@@ -43,10 +46,16 @@ public class GeradorZumbis : MonoBehaviour {
             }
         }
 
-        if (Time.timeSinceLevelLoad > contadorAumentaDificuldade)
+        if (Time.timeSinceLevelLoad > contadorAumentoSpawnRate)
         {
             quantidadeMaximaDeZumbisVivos++;
-            contadorAumentaDificuldade = Time.timeSinceLevelLoad + tempoProximoAumentoDeDificuldade;
+            contadorAumentoSpawnRate = Time.timeSinceLevelLoad + contadorAumentoSpawnRate;
+        }
+
+        if (Time.timeSinceLevelLoad > contadorVidaExtraZumbis)
+        {
+            vidaExtraZumbis++;
+            contadorVidaExtraZumbis = Time.timeSinceLevelLoad + contadorVidaExtraZumbis;
         }
     }
 
@@ -68,7 +77,12 @@ public class GeradorZumbis : MonoBehaviour {
             yield return null;
         }
 
-        ControlaInimigo zumbi  =Instantiate(Zumbi, posicaoDeCriacao, transform.rotation).GetComponent<ControlaInimigo>();
+        ControlaInimigo zumbi  = Instantiate(Zumbi, posicaoDeCriacao, transform.rotation).GetComponent<ControlaInimigo>();
+        if (vidaExtraZumbis >= 0)
+        {
+            zumbi.GetComponent<Status>().VidaInicial += vidaExtraZumbis;
+            zumbi.GetComponent<Status>().Vida += vidaExtraZumbis;
+        }
         zumbi.meuGerador = this;
         quantidadeDeZumbisVivos++;
     }
