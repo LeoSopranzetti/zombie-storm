@@ -41,5 +41,16 @@ public class ControlaMenu : MonoBehaviour
         #endif
     }
 
+    public void pistolClass()
+    {
+        PlayerPrefs.SetString("Class", "Pistol");
+        StartCoroutine(MudarCena("game"));
+    }
+
+    public void smgClass()
+    {
+        PlayerPrefs.SetString("Class", "SMG");
+        StartCoroutine(MudarCena("game"));
+    }
 
 }

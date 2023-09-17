@@ -22,6 +22,11 @@ public class ControlaArma : MonoBehaviour {
     // Use this for initialization
     void Start () {
         scriptControlaInterface = GameObject.FindObjectOfType(typeof(ControlaInterface)) as ControlaInterface;
+        if (PlayerPrefs.GetString("Class") != null)
+        {
+            actualWeapon = PlayerPrefs.GetString("Class");
+        } 
+        changeWeapon(actualWeapon);
     }
 	
 	// Update is called once per frame
@@ -79,7 +84,6 @@ public class ControlaArma : MonoBehaviour {
 
         if (actualWeapon == "SMG")
         {
-
             totalAmmunition = 30;
             scriptControlaInterface.updateWeaponNameAndAmmunitionQuantity(totalAmmunition, actualWeapon);
             pistol.SetActive(false);

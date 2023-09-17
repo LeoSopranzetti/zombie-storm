@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UpgradeArma : MonoBehaviour
+public class PlayerUpgrades : MonoBehaviour
 {
     public int tempoDeDestruicao = 20;
     public float velocidadeDeRotacao = 50f;
@@ -10,7 +10,7 @@ public class UpgradeArma : MonoBehaviour
 
     private void Start()
     {
-
+        scriptControlaInterface = GameObject.FindObjectOfType(typeof(ControlaInterface)) as ControlaInterface;
         Destroy(gameObject, tempoDeDestruicao);
 
     }
@@ -25,7 +25,8 @@ public class UpgradeArma : MonoBehaviour
     {
         if (objetoDeColisao.tag == "Jogador")
         {
-            objetoDeColisao.GetComponent<ControlaArma>().changeWeapon(gameObject.tag);
+            scriptControlaInterface.optionsForUpgrade();
+            //objetoDeColisao.GetComponent<ControlaArma>().changeWeapon(gameObject.tag);
             Destroy(gameObject);
         }
     }

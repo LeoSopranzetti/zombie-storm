@@ -17,6 +17,13 @@ public class ControlaInterface : MonoBehaviour {
     public Text textoChefeAparece;
     public Text weaponText;
     public Text ammunitionText;
+    public GameObject UpgradePanel;
+    public GameObject Position1;
+    public GameObject Position2;
+    public GameObject LifeUpgrade;
+    public GameObject ArmorUpgrade;
+    public GameObject AttackUpgrade;
+    public GameObject AttackSpeedUpgrade;
 
     // Use this for initialization
     void Start () {
@@ -27,6 +34,7 @@ public class ControlaInterface : MonoBehaviour {
         AtualizarSliderVidaJogador();
         Time.timeScale = 1;
         tempoPontuacaoSalvo = PlayerPrefs.GetFloat("PontuacaoMaxima");
+
     }
 
     public void AtualizarSliderVidaJogador ()
@@ -114,6 +122,80 @@ public class ControlaInterface : MonoBehaviour {
                 textoParaSumir.gameObject.SetActive(false);
             }
             yield return null;
+        }
+
+    }
+
+    public void lifeUpgrade()
+    {
+        scriptControlaJogador.statusJogador.VidaInicial += 1;
+        scriptControlaJogador.statusJogador.Vida += 1;
+        UpgradePanel.SetActive(false);
+        LifeUpgrade.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void armorUpgrade()
+    {
+        scriptControlaJogador.statusJogador.armor += 5;
+        UpgradePanel.SetActive(false);
+        ArmorUpgrade.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void attackUpgrade()
+    {
+        scriptControlaJogador.statusJogador.attack += 1;
+        UpgradePanel.SetActive(false);
+        AttackUpgrade.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void attackSpeedUpgrade()
+    {
+        scriptControlaJogador.statusJogador.attackSpeed += 0.1f;
+        UpgradePanel.SetActive(false);
+        AttackSpeedUpgrade.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    IEnumerator waitForStart()
+    {
+        // Aguardar 3 segundos
+        yield return new WaitForSeconds(1);
+        Time.timeScale = 1f;
+
+    }
+
+    public void optionsForUpgrade()
+    {
+        UpgradePanel.SetActive(true);
+        Time.timeScale = 0f;
+        // Faça algo com o objeto filho, por exemplo, ative/desative, mova, etc.
+        Transform randomChild = randomChildren(Position1);
+        Transform randomChild2 = randomChildren(Position2);
+        randomChild.gameObject.SetActive(true);
+        randomChild2.gameObject.SetActive(true);
+    }
+
+    public Transform randomChildren(GameObject father)
+    {
+
+        int childCount = father.transform.childCount;
+
+        if (childCount > 0)
+        {
+            // Gere um índice aleatório
+            int randomChildIndex = Random.Range(0, childCount);
+
+            // Acesse o objeto filho com base no índice aleatório
+            Transform randomChild = father.transform.GetChild(randomChildIndex);
+
+            return randomChild;
+
+        } else
+        {
+            return null;
         }
 
     }
