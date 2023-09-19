@@ -1509,14 +1509,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '- Vida e balanceamento de zumbis.
-
-    - Vida e balanceamento de bosses.
-
-    -
-    Sistema de upgrade.
-
-    - Sistema de classes.'
+  m_Text: "- Sistema de waves.\n- Reformula\xE7\xE3o de upgrades.\n- Auemnto do cen\xE1rio.\n-
+    Balanceamento geral."
 --- !u!222 &197049192
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8370,7 +8364,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Update 0.06
+  m_Text: Update 0.07
 --- !u!222 &1337475035
 CanvasRenderer:
   m_ObjectHideFlags: 0
