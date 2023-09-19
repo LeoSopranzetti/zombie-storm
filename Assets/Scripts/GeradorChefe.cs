@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GeradorChefe : MonoBehaviour
@@ -7,13 +6,15 @@ public class GeradorChefe : MonoBehaviour
 
     private float tempoParaProximaGeracao = 0;
     public float tempoEntreGeracoes = 60;
+    private float distanciaDeGeracao = 3;
     public GameObject chefePrefab;
     private ControlaInterface scriptControlaInterface;
     public Transform[] posicoesPossiveisDeGeracao;
     private Transform jogador;
-    public AudioClip somDeGeracao;
-    public float extraLifePerSpawn = 0;
-    public float extraDamagePerSpawn = 0;
+    public float increaseBossLife = 0;
+    public float increaseBossDamage = 0;
+    public LayerMask LayerBoss;
+    private float distanceFromPlayerToSpawn = 20f;
 
 
     private void Start()
@@ -23,46 +24,60 @@ public class GeradorChefe : MonoBehaviour
         jogador = GameObject.FindWithTag("Jogador").transform;
     }
 
-    private void Update()
-    {
-        if (Time.timeSinceLevelLoad > tempoParaProximaGeracao)
-        {
-            Vector3 posicaoDeCriacao = calcularPosicaoMaisDistanteDoJogador();
-            GameObject newBoss = Instantiate(chefePrefab, posicaoDeCriacao, Quaternion.identity);
-            addStatsPerSpawn(newBoss);
-            ControlaAudio.instancia.PlayOneShot(somDeGeracao);
-            scriptControlaInterface.AparecerChefeCriado();
-            tempoParaProximaGeracao = Time.timeSinceLevelLoad + tempoEntreGeracoes;
 
+    public void spawnBoss()
+    {
+        StartCoroutine(spawnBossCoroutine());
+    }
+
+    IEnumerator spawnBossCoroutine()
+    {
+        Vector3 posicaoDeCriacao = randomPosition();
+        Collider[] colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerBoss);
+
+        //Checa se a posição aleatoria gerada está longe do jogador
+        bool safeDistanceBewteenPlayer = Vector3.Distance(posicaoDeCriacao, jogador.transform.position) > distanceFromPlayerToSpawn;
+
+        while (colisores.Length <= 0 && !safeDistanceBewteenPlayer)
+        {
+            posicaoDeCriacao = randomPosition();
+            colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerBoss);
+            safeDistanceBewteenPlayer = Vector3.Distance(posicaoDeCriacao, jogador.transform.position) > distanceFromPlayerToSpawn;
+            yield return null;
         }
+        GameObject newBoss = Instantiate(chefePrefab, posicaoDeCriacao, Quaternion.identity);
+        addStatsPerSpawn(newBoss);
+        scriptControlaInterface.AparecerChefeCriado();
+        tempoParaProximaGeracao = Time.timeSinceLevelLoad + tempoEntreGeracoes;
     }
 
 
-    Vector3 calcularPosicaoMaisDistanteDoJogador()
+        Vector3 randomPosition()
     {
-        Vector3 posicaoMaiorDistancia = Vector3.zero;
-        float maiorDistancia = 0;
-        foreach (Transform posicao in posicoesPossiveisDeGeracao)
-        {
-            float distanciaEntreJogador = Vector3.Distance(posicao.position, jogador.position);
-            if (distanciaEntreJogador > maiorDistancia)
-            {
-                maiorDistancia = distanciaEntreJogador;
-                posicaoMaiorDistancia = posicao.position;
-            }
-        }
+        int getRandomIndex = Random.Range(0, posicoesPossiveisDeGeracao.Length);
+
+        Vector3 posicao = Random.insideUnitSphere * distanciaDeGeracao;
+        posicao += posicoesPossiveisDeGeracao[getRandomIndex].transform.position;
+        posicao.y = 0;
 
 
-        return posicaoMaiorDistancia;
+        return posicao;
     }
 
     void addStatsPerSpawn(GameObject newBoss)
     {
-        newBoss.GetComponent<Status>().VidaInicial += extraLifePerSpawn;
-        newBoss.GetComponent<Status>().Vida += extraLifePerSpawn;
-        newBoss.GetComponent<Status>().attack += extraDamagePerSpawn;
-        extraLifePerSpawn += 15;
-        extraDamagePerSpawn += 5;
+        Status statusNewBoss = newBoss.GetComponent<Status>();
+        statusNewBoss.VidaInicial += increaseBossLife;
+        statusNewBoss.Vida += increaseBossLife;
+        statusNewBoss.attack += increaseBossDamage;
     }
+
+    public void updaateBossStatus(float updateBossLife, float updateBossDamage)
+    {
+        increaseBossLife = updateBossLife;
+        increaseBossDamage = updateBossDamage;
+    }
+
+
 
 }

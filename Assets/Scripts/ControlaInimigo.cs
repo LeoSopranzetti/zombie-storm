@@ -7,19 +7,13 @@ using UnityEngine.UI;
 public class ControlaInimigo : MonoBehaviour, IMatavel
 {
 
-    private GameObject Jogador;
+    private GameObject jogador;
     private MovimentoPersonagem movimentaInimigo;
     private AnimacaoPersonagem animacaoInimigo;
     private Status statusInimigo;
     public AudioClip SomDeMorte;
-    private Vector3 posicaoAleatoria;
-    private Vector3 direcao;
-    private float contadorVagar;
-    private float tempoEntrePosicoesAleatorias = 4;
     public float porcentagemGerarKitMedico = 0.1f;
-    public float porcentagemDropUpgradePlayer = 0.03f;
     public GameObject kitMedicoPrefab;
-    public GameObject playerUpgradeItem;
     private ControlaInterface scriptControlaInterface;
     [HideInInspector]
     public GeradorZumbis meuGerador;
@@ -28,78 +22,90 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
     public Image imageSlider;
     public Slider sliderVidaZumbi;
     public Color corVidaMaxima, corVidaMinima;
+    private NavMeshAgent agent;
 
+
+    private void Awake()
+    {
+        statusInimigo = GetComponent<Status>();
+    }
 
     // Use this for initialization
     void Start () {
-        Jogador = GameObject.FindWithTag("Jogador");
+        jogador = GameObject.FindWithTag("Jogador");
         animacaoInimigo = GetComponent<AnimacaoPersonagem>();
+        agent = GetComponent<NavMeshAgent>();
         movimentaInimigo = GetComponent<MovimentoPersonagem>();
         AleatorizarZumbi();
-        statusInimigo = GetComponent<Status>();
         scriptControlaInterface = GameObject.FindObjectOfType(typeof(ControlaInterface)) as ControlaInterface;
         sliderVidaZumbi.maxValue = statusInimigo.VidaInicial;
+        agent.speed = statusInimigo.Velocidade;
         AtualizarInterface();
     }
 
+    private void Update()
+    {
+        changeSpeedBasedOnDistance();
+    }
+
+
+
     void FixedUpdate()
     {
-        float distancia = Vector3.Distance(transform.position, Jogador.transform.position);
 
-        movimentaInimigo.Rotacionar(direcao);
-        animacaoInimigo.Movimentar(direcao.magnitude);
+            agent.SetDestination(jogador.transform.position);
+            animacaoInimigo.Movimentar(agent.velocity.magnitude);
+        
+             bool estouPertodoJogador = agent.remainingDistance <= agent.stoppingDistance;
+        
+            if (agent.hasPath == true)
+            {
+                if (estouPertodoJogador)
+                {
+                    animacaoInimigo.Atacar(true);
+                    Vector3 direcao = jogador.transform.position - jogador.transform.position;
+                    movimentaInimigo.Rotacionar(direcao);
+                }
+                else
+                {
+                    if (agent.velocity != Vector3.zero)
+                    {
+                        transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
+                    }
 
-        if(distancia > 15)
+                animacaoInimigo.Atacar(false);
+                }
+            }
+    }
+
+    private void changeSpeedBasedOnDistance()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, jogador.transform.position);
+        float distanceToChangeSpeed = 50f;
+
+        // Verifique se a distância para o jogador é menor ou igual a 30.
+        if (distanceToPlayer >= distanceToChangeSpeed)
         {
-            Vagar ();
-        }
-        else if (distancia > 2.5)
-        {
-            direcao = Jogador.transform.position - transform.position;
-
-            movimentaInimigo.Movimentar(direcao, statusInimigo.Velocidade);
-
-            animacaoInimigo.Atacar(false);
+            agent.speed = 20f;
         }
         else
         {
-            direcao = Jogador.transform.position - transform.position;
-
-            animacaoInimigo.Atacar(true);
-        }
-    }
-
-    void Vagar ()
-    {
-        contadorVagar -= Time.deltaTime;
-        if(contadorVagar <= 0)
-        {
-            posicaoAleatoria = AleatorizarPosicao();
-            contadorVagar += tempoEntrePosicoesAleatorias + Random.Range(-1f, 1f);
+            // Gradualmente diminua a velocidade para 8 quando estiver mais longe.
+            float novaVelocidade = Mathf.Lerp(agent.speed, 8f, 0.1f);
+            agent.speed = novaVelocidade;
         }
 
-        bool ficouPertoOSuficiente = Vector3.Distance(transform.position, posicaoAleatoria) <= 0.05;
-        if (ficouPertoOSuficiente == false)
-        {
-            direcao = posicaoAleatoria - transform.position;
-            movimentaInimigo.Movimentar(direcao, statusInimigo.Velocidade);
-        }           
+        // Defina a posição de destino do agente para o jogador.
+        agent.SetDestination(jogador.transform.position);
     }
 
-    Vector3 AleatorizarPosicao ()
-    {
-        Vector3 posicao = Random.insideUnitSphere * 10;
-        posicao += transform.position;
-        posicao.y = transform.position.y;
 
-        return posicao;
-    }
 
     void AtacaJogador ()
     {
         int dano = Random.Range(20, 30);
         dano += (int)statusInimigo.attack;
-        Jogador.GetComponent<ControlaJogador>().TomarDano(dano);
+        jogador.GetComponent<ControlaJogador>().TomarDano(dano);
     }
 
     void AleatorizarZumbi ()
@@ -148,22 +154,13 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
         ControlaAudio.instancia.PlayOneShot(SomDeMorte);
         checkDrop();
         Destroy(gameObject, timeToZombieDespawnAfterDeath);
+        agent.enabled = false;
         scriptControlaInterface.atualizarQuantidadeDeZumbisMortos();
-        meuGerador.diminuirQuantidadeDeZumbisVivos();
+        WaveManager.instance.ZombieDefeated();
     }
 
     void checkDrop()
     {
-        if (Time.timeSinceLevelLoad > 30)
-        {
-            porcentagemDropUpgradePlayer = 0.2f;
-        } else if (Time.timeSinceLevelLoad > 90)
-        {
-            porcentagemDropUpgradePlayer = 0.1f;
-        } else if (Time.timeSinceLevelLoad > 180)
-        {
-            porcentagemDropUpgradePlayer = 0.05f;
-        }
 
         if (Random.value <= porcentagemGerarKitMedico)
         {
@@ -171,17 +168,17 @@ public class ControlaInimigo : MonoBehaviour, IMatavel
             timeToZombieDespawnAfterDeath = 1f;
             return;
         }
-        if (Random.value <= porcentagemDropUpgradePlayer)
-        {
-            Instantiate(playerUpgradeItem, transform.position, Quaternion.identity);
-            timeToZombieDespawnAfterDeath = 1f;
-            return;
-        }
+        //if (Random.value <= porcentagemDropUpgradePlayer)
+        //{
+         //   Instantiate(playerUpgradeItem, transform.position, Quaternion.identity);
+          //  timeToZombieDespawnAfterDeath = 1f;
+         //   return;
+        //}
     }
 
     void AtualizarInterface()
     {
-        if (statusInimigo.VidaInicial == 1)
+        if (statusInimigo.VidaInicial <= 0.5)
         {
             sliderVidaZumbi.gameObject.SetActive(false);
         } else

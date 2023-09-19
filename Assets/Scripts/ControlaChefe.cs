@@ -17,6 +17,10 @@ public class ControlaChefe : MonoBehaviour, IMatavel
     public GameObject particulaSangueZumbi;
     private float timeToBossDespawnAfterDeath = 20f;
 
+    private void Awake()
+    {
+        statusChefe = GetComponent<Status>();
+    }
 
     private void Start()
     {
@@ -33,14 +37,32 @@ public class ControlaChefe : MonoBehaviour, IMatavel
 
     private void Update()
     {
+        changeSpeedBasedOnDistance();
+    }
 
+    private void changeSpeedBasedOnDistance()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, jogador.transform.position);
+        float distanceToChangeSpeed = 50f;
 
+        // Verifique se a distância para o jogador é menor ou igual a 30.
+        if (distanceToPlayer >= distanceToChangeSpeed)
+        {
+            agente.speed = 20f;
+        }
+        else
+        {
+            // Gradualmente diminua a velocidade para 8 quando estiver mais longe.
+            float novaVelocidade = Mathf.Lerp(agente.speed, 8f, 0.1f);
+            agente.speed = novaVelocidade;
+        }
 
+        // Defina a posição de destino do agente para o jogador.
+        agente.SetDestination(jogador.transform.position);
     }
 
     private void FixedUpdate()
     {
-
         agente.SetDestination(jogador.position);
         animacaoChefe.Movimentar(agente.velocity.magnitude);
 
@@ -93,6 +115,7 @@ public class ControlaChefe : MonoBehaviour, IMatavel
         movimentoChefe.Morrer(timeToBossDespawnAfterDeath);
         this.enabled = false;
         Instantiate(kitMedicoPrefab, transform.position, Quaternion.identity);
+        WaveManager.instance.bossDefeated();
         agente.enabled = false;
 
     }

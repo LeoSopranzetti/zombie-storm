@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,12 +8,23 @@ public class ControlaMenu : MonoBehaviour
 {
 
     public GameObject botaoSair;
+    public TextMeshProUGUI pistolButtonText;
+    public TextMeshProUGUI smgButtonText;
+    public TextMeshProUGUI exitButtonText;
 
     private void Start()
     {
         #if UNITY_STANDALONE || UNITY_EDITOR
             botaoSair.SetActive(true);
-        #endif
+#endif
+
+        fontAnimation(pistolButtonText);
+        fontAnimation(smgButtonText);
+    }
+
+    private void fontAnimation(TextMeshProUGUI text)
+    {
+        text.gameObject.LeanScale(new Vector3(1.2f, 1.2f), 0.4f).setLoopPingPong();
     }
 
     public void JogarJogo()

@@ -19,12 +19,20 @@ public class ControlaInterface : MonoBehaviour {
     public Text weaponText;
     public Text ammunitionText;
     public Text playerActualLife;
+    public Text waveNumberText;
+    public Text numberOfEnemies;
+    public Text playerMaxLifeText;
+    public Text playerSpeedText;
+    public Text playerAttackText;
+    public Text playerArmorText;
+    public Text playerAttackSpeedText;
     public GameObject UpgradePanel;
     public GameObject Position1;
     public GameObject LifeUpgrade;
     public GameObject ArmorUpgrade;
     public GameObject AttackUpgrade;
     public GameObject AttackSpeedUpgrade;
+    public GameObject waveStatus;
     private Vector2 startPosition = new Vector2(0f, 0f);
 
     // Use this for initialization
@@ -37,6 +45,7 @@ public class ControlaInterface : MonoBehaviour {
         Time.timeScale = 1;
         tempoPontuacaoSalvo = PlayerPrefs.GetFloat("PontuacaoMaxima");
 
+        waveStatus.SetActive(true);
     }
 
     public void AtualizarSliderVidaJogador ()
@@ -102,9 +111,14 @@ public class ControlaInterface : MonoBehaviour {
         StartCoroutine(DesaparecerTexto(2, textoChefeAparece));
     }
 
+    public void waveNumberTextOnScreen(int waveNumber, int waveNumberEnemies)
+    {
+        waveNumberText.text = string.Format("Wave {0}", waveNumber);
+        numberOfEnemies.text = string.Format("Inimigos restantes: {0}", waveNumberEnemies);
+    }
+
     IEnumerator DesaparecerTexto(float tempoDeSumico, Text textoParaSumir)
     {
-        textoParaSumir.gameObject.SetActive(true);
         Color corTexto = textoParaSumir.color;
         corTexto.a = 1;
         textoParaSumir.color = corTexto;
@@ -126,6 +140,7 @@ public class ControlaInterface : MonoBehaviour {
 
     public void optionsForUpgrade()
     {
+        waveStatus.SetActive(false);
         UpgradePanel.SetActive(true);
         Time.timeScale = 0f;
 
@@ -138,11 +153,13 @@ public class ControlaInterface : MonoBehaviour {
             randomIndex2 = Random.Range(0, Position1.transform.childCount);
         } while (randomIndex2 == randomIndex1);
 
-        Debug.Log(randomIndex2 + " " + randomIndex1);
 
         //RANDOMIZA DOIS UPGRADES PARA SEREM EXIBIDOS NA TELA
         Transform randomChild = randomChildren(Position1, randomIndex1);
         Transform randomChild2 = randomChildren(Position1, randomIndex2);
+        Debug.Log(randomChild);
+        Debug.Log(randomChild2);
+
 
         //SETA O ESPAÇAMENTO DOS DOIS UPGRADES NA TELA
         Vector2 buttonSpacing1 = new Vector2(160f, 0f);
@@ -183,11 +200,13 @@ public class ControlaInterface : MonoBehaviour {
 
     public void lifeUpgrade()
     {
-        scriptControlaJogador.statusJogador.VidaInicial += 25;
-        scriptControlaJogador.statusJogador.Vida += 25;
+        scriptControlaJogador.statusJogador.VidaInicial += 40;
+        scriptControlaJogador.statusJogador.Vida += 40;
         UpgradePanel.SetActive(false);
         LifeUpgrade.SetActive(false);
+        updatePlayerStatusInterface();
         Time.timeScale = 1f;
+        waveStatus.SetActive(true);
         AtualizarSliderVidaJogador();
     }
 
@@ -196,22 +215,26 @@ public class ControlaInterface : MonoBehaviour {
         scriptControlaJogador.statusJogador.armor += 5;
         UpgradePanel.SetActive(false);
         ArmorUpgrade.SetActive(false);
+        updatePlayerStatusInterface();
         Time.timeScale = 1f;
+        waveStatus.SetActive(true);
     }
 
     public void attackUpgrade()
     {
-        scriptControlaJogador.statusJogador.attack += 0.4f;
+        scriptControlaJogador.statusJogador.attack += 1f;
         UpgradePanel.SetActive(false);
         AttackUpgrade.SetActive(false);
+        updatePlayerStatusInterface();
         Time.timeScale = 1f;
+        waveStatus.SetActive(true);
     }
 
     public void attackSpeedUpgrade()
     {
         if (scriptControlaJogador.statusJogador.attackSpeed >= 0.01f)
         {
-            scriptControlaJogador.statusJogador.attackSpeed -= 0.01f;
+            scriptControlaJogador.statusJogador.attackSpeed -= 0.03f;
         } 
         else 
         {
@@ -220,6 +243,19 @@ public class ControlaInterface : MonoBehaviour {
 
         UpgradePanel.SetActive(false);
         AttackSpeedUpgrade.SetActive(false);
+        updatePlayerStatusInterface();
         Time.timeScale = 1f;
+        waveStatus.SetActive(true);
+    }
+
+    public void updatePlayerStatusInterface()
+    {
+        scriptControlaJogador = GameObject.FindWithTag("Jogador").GetComponent<ControlaJogador>();
+        playerMaxLifeText.text = string.Format($"Vida máxima: {scriptControlaJogador.statusJogador.VidaInicial}");
+        playerSpeedText.text = string.Format($"Velocidade: {scriptControlaJogador.statusJogador.Velocidade}");
+        playerAttackText.text = string.Format($"Ataque: {scriptControlaJogador.statusJogador.attack}");
+        playerArmorText.text = string.Format($"Armadura: {scriptControlaJogador.statusJogador.armor}");
+        playerAttackSpeedText.text = string.Format($"Velocidade de disparo: {scriptControlaJogador.statusJogador.attackSpeed}/s");
+
     }
 }

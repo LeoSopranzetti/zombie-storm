@@ -1,62 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GeradorZumbis : MonoBehaviour {
 
     public GameObject Zumbi;
-    private float contadorTempo = 0;
     public float TempoGerarZumbi = 1;
     public LayerMask LayerZumbi;
     private float distanciaDeGeracao = 3;
-    private float DistanciaDoJogadorParaGeracao = 13;
-    private GameObject jogador;
-    private int quantidadeMaximaDeZumbisVivos = 2;
     private int quantidadeDeZumbisVivos;
-    private float contadorAumentoSpawnRate;
-    private int vidaExtraZumbis = 0;
-    private float tempoProximoAumentoSpawnRate = 30;
-    private float tempoProximaVidaExtraZumbis = 30;
-    private float contadorVidaExtraZumbis;
+    public Transform[] posicoesPossiveisDeGeracao;
+    private float increaseZombieLife = 0;
+    private float increaseZombieDamage = 0;
+    private GameObject player;
+    private float distanceFromPlayerToSpawn = 20f;
+
 
     private void Start()
     {
-        jogador = GameObject.FindWithTag("Jogador");
-        contadorAumentoSpawnRate = tempoProximoAumentoSpawnRate;
-        contadorVidaExtraZumbis = tempoProximaVidaExtraZumbis;
-        for (int i = 0; i < quantidadeMaximaDeZumbisVivos; i++)
-        {
-            StartCoroutine(GerarNovoZumbi());
-        }
-
-    }
-
-    // Update is called once per frame
-    void Update () {
-        bool possoGerarZumbisPelaDistancia = Vector3.Distance(transform.position, jogador.transform.position) > DistanciaDoJogadorParaGeracao;
-
-        if (possoGerarZumbisPelaDistancia == true && quantidadeDeZumbisVivos < quantidadeMaximaDeZumbisVivos)
-        {
-            contadorTempo += Time.deltaTime;
-
-            if (contadorTempo >= TempoGerarZumbi)
-            {
-                StartCoroutine(GerarNovoZumbi());
-                contadorTempo = 0;
-            }
-        }
-
-        if (Time.timeSinceLevelLoad > contadorAumentoSpawnRate)
-        {
-            quantidadeMaximaDeZumbisVivos++;
-            contadorAumentoSpawnRate = Time.timeSinceLevelLoad + contadorAumentoSpawnRate;
-        }
-
-        if (Time.timeSinceLevelLoad > contadorVidaExtraZumbis)
-        {
-            vidaExtraZumbis++;
-            contadorVidaExtraZumbis = Time.timeSinceLevelLoad + contadorVidaExtraZumbis;
-        }
+        player = GameObject.FindWithTag("Jogador");
     }
 
     void OnDrawGizmos()
@@ -65,40 +28,64 @@ public class GeradorZumbis : MonoBehaviour {
         Gizmos.DrawWireSphere(transform.position, distanciaDeGeracao);
     }
 
-    IEnumerator GerarNovoZumbi ()
-    {
-        Vector3 posicaoDeCriacao = AleatorizarPosicao();
-        Collider[] colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerZumbi);
-
-        while(colisores.Length > 0)
-        {
-            posicaoDeCriacao = AleatorizarPosicao();
-            colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerZumbi);
-            yield return null;
-        }
-
-        ControlaInimigo zumbi  = Instantiate(Zumbi, posicaoDeCriacao, transform.rotation).GetComponent<ControlaInimigo>();
-        if (vidaExtraZumbis >= 0)
-        {
-            zumbi.GetComponent<Status>().VidaInicial += vidaExtraZumbis;
-            zumbi.GetComponent<Status>().Vida += vidaExtraZumbis;
-            zumbi.GetComponent<Status>().attack += 5;
-        }
-        zumbi.meuGerador = this;
-        quantidadeDeZumbisVivos++;
-    }
-
-    Vector3 AleatorizarPosicao ()
-    {
-        Vector3 posicao = Random.insideUnitSphere * distanciaDeGeracao;
-        posicao += transform.position;
-        posicao.y = 0;
-
-        return posicao;
-    }
 
     public void diminuirQuantidadeDeZumbisVivos()
     {
         quantidadeDeZumbisVivos--;
+    }
+
+    public void spawnZombie()
+    {
+        StartCoroutine(spawnZombieCoroutine());
+
+    }
+
+    IEnumerator spawnZombieCoroutine()
+    {
+        //Baseado na quantidade de posições dentro do gerador aleatoriza uma
+        Vector3 posicaoDeCriacao = AleatorizarPosicao();
+
+        //Checa se existem outros colisores dentro a posição
+        Collider[] colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerZumbi);
+
+        //Checa se a posição aleatoria gerada está longe do jogador
+        bool safeDistanceBewteenPlayer = Vector3.Distance(posicaoDeCriacao, player.transform.position) > distanceFromPlayerToSpawn;
+
+
+        while (colisores.Length <= 0 && !safeDistanceBewteenPlayer)
+        {
+            posicaoDeCriacao = AleatorizarPosicao();
+            colisores = Physics.OverlapSphere(posicaoDeCriacao, 1, LayerZumbi);
+            safeDistanceBewteenPlayer = Vector3.Distance(posicaoDeCriacao, player.transform.position) > distanceFromPlayerToSpawn;
+            yield return null;
+        }
+
+        GameObject zombie =  Instantiate(Zumbi, posicaoDeCriacao, transform.rotation);
+        Status zombieStatus = zombie.GetComponent<Status>();
+
+        zombieStatus.Vida += increaseZombieLife;
+        zombieStatus.VidaInicial += increaseZombieLife;
+        zombieStatus.attack += increaseZombieDamage;
+
+        zombie.GetComponent<NavMeshAgent>().agentTypeID = 0;
+        quantidadeDeZumbisVivos++;
+    }
+
+    Vector3 AleatorizarPosicao()
+    {
+        int getRandomIndex = Random.Range(0, posicoesPossiveisDeGeracao.Length);
+
+        Vector3 posicao = Random.insideUnitSphere * distanciaDeGeracao;
+        posicao += posicoesPossiveisDeGeracao[getRandomIndex].transform.position;
+        posicao.y = 0;
+
+
+        return posicao;
+    }
+
+    public void updateZombieStatus(float updateZombieLife, float updateZombieDamage)
+    {
+        increaseZombieLife = updateZombieLife;
+        increaseZombieDamage = updateZombieDamage;
     }
 }

@@ -101,5 +101,6 @@ public class ControlaJogador : MonoBehaviour, IMatavel, ICuravel
             statusJogador.attack = 0.5f;
             statusJogador.attackSpeed = 0.35f;
         }
+        scriptControlaInterface.updatePlayerStatusInterface();
     }
 }
